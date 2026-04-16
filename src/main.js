@@ -14,7 +14,7 @@ const config = {
   backgroundColor: "#101820",
   
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.ENVELOP,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     // 부모 요소의 크기에 맞춰 확장
     expandParent: true,

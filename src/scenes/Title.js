@@ -45,21 +45,29 @@ export default class Title extends Phaser.Scene {
 
     // 5. 씬 전환 이벤트 (한 번만 실행)
     this.input.once("pointerdown", () => {
-      // 1. 풀스크린 시도 (데스크탑 및 안드로이드 크롬 대응)
-      console.log("풀스크린 시도???: "+!this.scale.isFullscreen);
+      // [로그 1] 브라우저가 풀스크린 기능을 지원하는지 확인
+      console.log("브라우저 풀스크린 지원 여부:", this.scale.fullscreen.available);
+      
+      // [로그 2] 현재 문서의 풀스크린 타겟 확인
+      console.log("풀스크린 타겟 요소:", this.scale.fullscreenTarget);
+
       if (!this.scale.isFullscreen) {
           try {
-              console.log("풀스크린 시도!!!!!");
+              // [로그 3] 실제 실행 직전 상태
+              console.log("요청 전 상태:", this.scale.fullscreen.active);
+              
               this.scale.startFullscreen();
-              console.log("풀스크린 시도 완료");
+              
+              // [로그 4] 실행 직후 (비동기라 바로 반영 안 될 수 있음)
+              setTimeout(() => {
+                  console.log("1초 후 풀스크린 상태:", this.scale.isFullscreen);
+              }, 1000);
+
           } catch (error) {
-              console.warn("풀스크린 진입 실패 (브라우저 제한):", error);
+              console.error("실행 중 에러 발생:", error);
           }
       }
-
-      // 2. 씬 전환
-      console.log("모험 시작!");
       this.scene.start("World");
-    });
+    }); 
   }
 }
