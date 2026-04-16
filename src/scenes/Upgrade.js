@@ -31,6 +31,16 @@ export default class Upgrade extends Phaser.Scene {
     .setOrigin(0.5)
     .setInteractive({ useHandCursor: true })
     .on("pointerdown", () => this.scene.start("World"));
+
+    this.scale.on('orientationchange', (orientation) => {
+        if (orientation === Phaser.Scale.PORTRAIT) {
+            // 세로 모드일 때 경고 표시 (텍스트나 이미지)
+            console.log("화면을 가로로 돌려주세요!");
+        } else {
+            // 가로 모드일 때 정상 작동
+            this.scale.refresh();
+        }
+    });
   }
 
   // 장비 강화 섹션

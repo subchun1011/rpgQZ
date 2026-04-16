@@ -10,9 +10,7 @@
   --shadow: 0 18px 40px rgba(43, 58, 74, 0.16);
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -22,6 +20,8 @@ body {
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.65), transparent 38%),
     linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+  /* iOS 스크롤 탄성 방지 */
+  overscroll-behavior: none;
 }
 
 #game-shell {
@@ -30,31 +30,19 @@ body {
   padding: 24px 0 40px;
 }
 
-.shell-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
+.shell-header { text-align: center; margin-bottom: 20px; }
+.shell-header h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.2rem); letter-spacing: 0.04em; }
+.shell-header p { margin: 8px 0 0; color: var(--text-muted); }
 
-.shell-header h1 {
-  margin: 0;
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  letter-spacing: 0.04em;
-}
-
-.shell-header p {
-  margin: 8px 0 0;
-  color: var(--text-muted);
-}
-
+/* 게임 컨테이너 */
 #game-root {
   width: 100%;
-  min-height: 720px;
+  aspect-ratio: 16 / 9; /* 비율 고정 */
   display: grid;
   place-items: center;
-  padding: 16px;
   border: 1px solid var(--panel-border);
   border-radius: 24px;
-  background: var(--panel);
+  background: #000; /* 게임 몰입감을 위해 배경 검정 */
   box-shadow: var(--shadow);
   overflow: hidden;
 }
@@ -62,19 +50,28 @@ body {
 #game-root canvas {
   display: block;
   max-width: 100%;
-  height: auto;
-  border-radius: 18px;
+  max-height: 100%;
+  object-fit: contain;
 }
 
+/* 📱 모바일(가로/세로) 최적화 미디어 쿼리 */
 @media (max-width: 768px) {
+  body { background: #101820; } /* 모바일은 게임 배경색으로 통일 */
+  
   #game-shell {
-    width: min(100vw - 20px, 720px);
-    padding-top: 16px;
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
   }
 
+  .shell-header { display: none; } /* 모바일은 헤더 숨김 */
+
   #game-root {
-    min-height: 540px;
-    padding: 12px;
-    border-radius: 18px;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    padding: 0;
   }
 }
