@@ -1,0 +1,2 @@
+이미지 에셋 위치 예시:
+assets/images/ui/title-bg.png

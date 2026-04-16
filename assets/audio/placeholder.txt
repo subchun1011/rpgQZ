@@ -1,0 +1,2 @@
+오디오 에셋 위치 예시:
+assets/audio/bgm/field-theme.mp3

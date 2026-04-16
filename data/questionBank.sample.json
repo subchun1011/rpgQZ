@@ -1,0 +1,17 @@
+{
+  "subject": "math",
+  "grade": "middle-school",
+  "questions": [
+    {
+      "id": "math-001",
+      "type": "multiple-choice",
+      "prompt": "2 + 3 = ?",
+      "choices": ["4", "5", "6", "7"],
+      "answer": "5",
+      "reward": {
+        "gold": 10,
+        "experience": 5
+      }
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+스프라이트 에셋 위치 예시:
+assets/sprites/player/hero-idle.png

@@ -1,0 +1,22 @@
+{
+  "gameTitle": "RPG 학습 게임",
+  "assetBasePath": "assets/",
+  "startingScene": "Boot",
+  "subjects": [
+    {
+      "id": "math",
+      "label": "수학",
+      "enabled": true
+    },
+    {
+      "id": "english",
+      "label": "영어",
+      "enabled": true
+    },
+    {
+      "id": "science",
+      "label": "과학",
+      "enabled": false
+    }
+  ]
+}
