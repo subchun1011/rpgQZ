@@ -48,7 +48,9 @@ export default class Title extends Phaser.Scene {
       // 1. 풀스크린 시도 (데스크탑 및 안드로이드 크롬 대응)
       if (!this.scale.isFullscreen) {
           try {
+              console.log("풀스크린 시도!!!!!");
               this.scale.startFullscreen();
+              console.log("풀스크린 시도 완료");
           } catch (error) {
               console.warn("풀스크린 진입 실패 (브라우저 제한):", error);
           }
