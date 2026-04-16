@@ -46,6 +46,7 @@ export default class Title extends Phaser.Scene {
     // 5. 씬 전환 이벤트 (한 번만 실행)
     this.input.once("pointerdown", () => {
       // 1. 풀스크린 시도 (데스크탑 및 안드로이드 크롬 대응)
+      console.log("풀스크린 시도???: "+!this.scale.isFullscreen);
       if (!this.scale.isFullscreen) {
           try {
               console.log("풀스크린 시도!!!!!");
