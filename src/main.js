@@ -5,6 +5,47 @@ import Battle from "./scenes/Battle.js";
 import Upgrade from "./scenes/Upgrade.js";
 import { gameManager } from "./utils/GameManager.js";
 
+const updateViewportHeight = () => {
+  const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+  document.documentElement.style.setProperty("--app-height", `${viewportHeight}px`);
+};
+
+const updateOrientationNotice = () => {
+  const isPortraitMobile = window.matchMedia(
+    "(orientation: portrait) and (max-width: 1024px)"
+  ).matches;
+  const notice = document.getElementById("orientation-notice");
+
+  document.body.classList.toggle("is-portrait", isPortraitMobile);
+
+  if (notice) {
+    notice.setAttribute("aria-hidden", String(!isPortraitMobile));
+  }
+};
+
+const refreshLayout = () => {
+  updateViewportHeight();
+  updateOrientationNotice();
+
+  if (window.phaserGame?.scale) {
+    window.phaserGame.scale.refresh();
+  }
+};
+
+const tryLockLandscape = async () => {
+  const orientationApi = window.screen?.orientation;
+
+  if (!orientationApi?.lock) {
+    return;
+  }
+
+  try {
+    await orientationApi.lock("landscape");
+  } catch (error) {
+    // iOS Safari does not reliably support orientation lock without fullscreen.
+  }
+};
+
 const config = {
   type: Phaser.AUTO,
   parent: "game-root",
@@ -13,41 +54,51 @@ const config = {
   backgroundColor: "#101820",
   
   scale: {
-    // 🔥 ENVELOP: 화면의 빈 공간 없이 꽉 채우며 확대
     mode: Phaser.Scale.ENVELOP,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     expandParent: true,
     fullscreenTarget: "game-root",
-    // 🔥 모바일 가로 모드 강제 및 방향 전환 대응
     forceOrientation: true,
-    orientation: 'landscape'
+    orientation: "landscape"
   },
 
   physics: {
-    default: 'arcade',
+    default: "arcade",
     arcade: {
       gravity: { y: 0 },
-      debug: false 
+      debug: false
     }
   },
 
   scene: [Boot, Title, World, Battle, Upgrade],
 };
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
+  updateViewportHeight();
+  updateOrientationNotice();
+
   gameManager.initialize();
   window.gameManager = gameManager;
   window.phaserGame = new Phaser.Game(config);
 
-  // 사이즈 변경 시 즉시 갱신 (iOS 주소창 대응)
-  window.addEventListener('resize', () => {
-    if (window.phaserGame) {
-      window.phaserGame.scale.refresh();
+  const handleResize = () => {
+    refreshLayout();
+  };
+
+  window.addEventListener("resize", handleResize, { passive: true });
+  window.addEventListener("orientationchange", handleResize, { passive: true });
+  window.visualViewport?.addEventListener("resize", handleResize, { passive: true });
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      refreshLayout();
     }
   });
 
-  // iOS Safari를 위한 상단 스크롤 숨김 트릭
+  refreshLayout();
+  await tryLockLandscape();
+
   setTimeout(() => {
     window.scrollTo(0, 1);
+    refreshLayout();
   }, 100);
 });

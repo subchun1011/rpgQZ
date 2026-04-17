@@ -2,7 +2,13 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#101820" />
     <title>RPG 학습 게임</title>
     <link rel="stylesheet" href="./style.css" />
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
@@ -14,6 +20,12 @@
         <p>Phaser 3 기반 학습형 RPG 프로토타입</p>
       </header>
       <main id="game-root" aria-label="Game Canvas Container"></main>
+    </div>
+    <div id="orientation-notice" class="orientation-notice" aria-hidden="true">
+      <div class="orientation-card" role="alert" aria-live="polite">
+        <strong>가로로 돌려주세요</strong>
+        <p>모바일에서는 가로 화면에서 가장 안정적으로 플레이할 수 있어요.</p>
+      </div>
     </div>
 
     <script type="module" src="./src/main.js"></script>
