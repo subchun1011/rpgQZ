@@ -16,7 +16,7 @@ export default class Battle extends Phaser.Scene {
     const { width, height } = this.scale;
 
     // 1. 배경 및 레이아웃 (어두운 전투 분위기)
-    this.add.rectangle(0, 0, width, height, 0x1b1b1b).setOrigin(0);
+    this.background = this.add.rectangle(0, 0, width, height, 0x1b1b1b).setOrigin(0);
     
     // 플레이어 영역 (파란색 사각형)
     this.playerSide = this.add.rectangle(width * 0.2, height * 0.5, 100, 150, 0x3498db);
@@ -24,8 +24,8 @@ export default class Battle extends Phaser.Scene {
     this.enemySide = this.add.rectangle(width * 0.8, height * 0.5, 120, 180, 0xe74c3c);
 
     // 2. 문제 카드 영역 (UI)
-    this.add.rectangle(width / 2, height * 0.25, 400, 150, 0xffffff, 0.1)
-            .setStrokeStyle(2, 0xffffff);
+    this.problemCard = this.add.rectangle(width / 2, height * 0.25, 400, 150, 0xffffff, 0.1)
+      .setStrokeStyle(2, 0xffffff);
     
     this.problemText = this.add.text(width / 2, height * 0.25, "", {
         fontSize: "48px",
@@ -38,6 +38,15 @@ export default class Battle extends Phaser.Scene {
     
     // 4. 초기 문제 생성
     this.generateProblem();
+
+    this.handleResize = (gameSize) => {
+      this.layout(gameSize.width, gameSize.height);
+    };
+
+    this.scale.on("resize", this.handleResize);
+    this.events.once("shutdown", () => {
+      this.scale.off("resize", this.handleResize);
+    });
   }
 
   generateProblem() {
@@ -78,6 +87,8 @@ export default class Battle extends Phaser.Scene {
         btn.on('pointerdown', () => this.handleAnswer(opt, container));
         this.answerButtons.add(container);
     });
+
+    this.layout(width, height);
   }
 
   handleAnswer(selected, container) {
@@ -109,5 +120,23 @@ export default class Battle extends Phaser.Scene {
 
   shuffleArray(array) {
     return array.sort(() => Math.random() - 0.5);
+  }
+
+  layout(width, height) {
+    this.background?.setPosition(0, 0).setSize(width, height);
+    this.problemCard?.setPosition(width / 2, height * 0.25);
+    this.problemText?.setPosition(width / 2, height * 0.25);
+    this.playerSide?.setPosition(width * 0.2, height * 0.5);
+    this.enemySide?.setPosition(width * 0.8, height * 0.5);
+
+    if (this.answerButtons) {
+      this.answerButtons.iterate((buttonContainer, index) => {
+        if (!buttonContainer) {
+          return;
+        }
+
+        buttonContainer.setPosition(width * (0.2 + index * 0.2), height * 0.75);
+      });
+    }
   }
 }

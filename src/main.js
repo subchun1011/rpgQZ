@@ -6,7 +6,26 @@ import Upgrade from "./scenes/Upgrade.js";
 import { gameManager } from "./utils/GameManager.js";
 
 // [핵심] 뷰포트 및 레이아웃 관리 로직
+const getViewportSize = () => {
+  const viewport = window.visualViewport;
+  return {
+    width: Math.round(viewport?.width ?? window.innerWidth),
+    height: Math.round(viewport?.height ?? window.innerHeight),
+  };
+};
+
 const updateViewportHeight = () => {
+  const { height } = getViewportSize();
+  document.documentElement.style.setProperty("--app-height", `${height}px`);
+};
+
+const updateViewportWidth = () => {
+  const { width } = getViewportSize();
+  document.documentElement.style.setProperty("--app-width", `${width}px`);
+};
+
+const updateViewportSizeVars = () => {
+  updateViewportWidth();
   const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
   document.documentElement.style.setProperty("--app-height", `${viewportHeight}px`);
 };
@@ -37,13 +56,31 @@ const updateOrientationNotice = () => {
 };
 
 const refreshLayout = () => {
-  updateViewportHeight();
+  const { width, height } = getViewportSize();
+
+  document.documentElement.style.setProperty("--app-width", `${width}px`);
+  document.documentElement.style.setProperty("--app-height", `${height}px`);
   updateDeviceLayoutState();
   updateOrientationNotice();
 
   if (window.phaserGame?.scale) {
+    if (typeof window.phaserGame.scale.resize === "function") {
+      window.phaserGame.scale.resize(width, height);
+    }
     window.phaserGame.scale.refresh();
   }
+};
+
+const scheduleRefreshBurst = () => {
+  const refreshDelays = [0, 80, 180, 320, 500, 900];
+
+  refreshDelays.forEach((delay) => {
+    window.setTimeout(() => {
+      window.requestAnimationFrame(() => {
+        refreshLayout();
+      });
+    }, delay);
+  });
 };
 
 const tryLockLandscape = async () => {
@@ -64,7 +101,7 @@ const config = {
   backgroundColor: "#101820",
   
   scale: {
-    mode: Phaser.Scale.ENVELOP, // 화면을 꽉 채우는 모드
+    mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     expandParent: true,
     fullscreenTarget: "game-root",
@@ -84,7 +121,7 @@ const config = {
 };
 
 window.addEventListener("load", async () => {
-  updateViewportHeight();
+  updateViewportSizeVars();
   updateDeviceLayoutState();
   updateOrientationNotice();
 
@@ -97,17 +134,21 @@ window.addEventListener("load", async () => {
   window.addEventListener("resize", handleResize, { passive: true });
   window.addEventListener("orientationchange", handleResize, { passive: true });
   window.visualViewport?.addEventListener("resize", handleResize, { passive: true });
+  window.addEventListener("pageshow", () => {
+    scheduleRefreshBurst();
+  }, { passive: true });
   
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) refreshLayout();
+    if (!document.hidden) scheduleRefreshBurst();
   });
 
   refreshLayout();
+  scheduleRefreshBurst();
   await tryLockLandscape();
 
   // iOS Safari 주소창 숨기기 트리거
   setTimeout(() => {
     window.scrollTo(0, 1);
-    refreshLayout();
+    scheduleRefreshBurst();
   }, 100);
 });
