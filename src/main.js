@@ -6,28 +6,23 @@ import Upgrade from "./scenes/Upgrade.js";
 import { gameManager } from "./utils/GameManager.js";
 
 // [핵심] 뷰포트 및 레이아웃 관리 로직
-const getViewportSize = () => {
+const getViewportRect = () => {
   const viewport = window.visualViewport;
   return {
     width: Math.round(viewport?.width ?? window.innerWidth),
     height: Math.round(viewport?.height ?? window.innerHeight),
+    top: Math.round(viewport?.offsetTop ?? 0),
+    left: Math.round(viewport?.offsetLeft ?? 0),
   };
 };
 
-const updateViewportHeight = () => {
-  const { height } = getViewportSize();
-  document.documentElement.style.setProperty("--app-height", `${height}px`);
-};
+const updateViewportRectVars = () => {
+  const { width, height, top, left } = getViewportRect();
 
-const updateViewportWidth = () => {
-  const { width } = getViewportSize();
   document.documentElement.style.setProperty("--app-width", `${width}px`);
-};
-
-const updateViewportSizeVars = () => {
-  updateViewportWidth();
-  const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
-  document.documentElement.style.setProperty("--app-height", `${viewportHeight}px`);
+  document.documentElement.style.setProperty("--app-height", `${height}px`);
+  document.documentElement.style.setProperty("--app-top", `${top}px`);
+  document.documentElement.style.setProperty("--app-left", `${left}px`);
 };
 
 const isTouchDevice = () =>
@@ -56,10 +51,9 @@ const updateOrientationNotice = () => {
 };
 
 const refreshLayout = () => {
-  const { width, height } = getViewportSize();
+  const { width, height } = getViewportRect();
 
-  document.documentElement.style.setProperty("--app-width", `${width}px`);
-  document.documentElement.style.setProperty("--app-height", `${height}px`);
+  updateViewportRectVars();
   updateDeviceLayoutState();
   updateOrientationNotice();
 
@@ -121,7 +115,7 @@ const config = {
 };
 
 window.addEventListener("load", async () => {
-  updateViewportSizeVars();
+  updateViewportRectVars();
   updateDeviceLayoutState();
   updateOrientationNotice();
 
@@ -134,6 +128,7 @@ window.addEventListener("load", async () => {
   window.addEventListener("resize", handleResize, { passive: true });
   window.addEventListener("orientationchange", handleResize, { passive: true });
   window.visualViewport?.addEventListener("resize", handleResize, { passive: true });
+  window.visualViewport?.addEventListener("scroll", handleResize, { passive: true });
   window.addEventListener("pageshow", () => {
     scheduleRefreshBurst();
   }, { passive: true });
@@ -148,7 +143,7 @@ window.addEventListener("load", async () => {
 
   // iOS Safari 주소창 숨기기 트리거
   setTimeout(() => {
-    window.scrollTo(0, 1);
+    window.scrollTo(0, 0);
     scheduleRefreshBurst();
   }, 100);
 });

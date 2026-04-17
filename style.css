@@ -1,6 +1,9 @@
 :root {
   color-scheme: light;
+  --app-width: 100vw;
   --app-height: 100vh; /* JS에서 업데이트됨 */
+  --app-top: 0px;
+  --app-left: 0px;
   --bg-top: #f5efe4;
   --bg-bottom: #d6e5f3;
   --panel: rgba(255, 252, 245, 0.88);
@@ -15,14 +18,14 @@
 
 html, body {
   width: 100%;
-  height: var(--app-height); /* 전체 높이를 고정 */
+  height: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden; /* 스크롤 절대 금지 */
-  position: fixed; /* iOS 주소창 튕김 방지 핵심 */
 }
 
 body {
+  position: relative;
   font-family: "Segoe UI", "Noto Sans KR", sans-serif;
   color: var(--text-main);
   background:
@@ -35,7 +38,7 @@ body {
 
 #game-shell {
   width: min(1100px, calc(100vw - 32px));
-  height: 100%;
+  min-height: 100%;
   margin: 0 auto;
   padding: 24px 0 40px;
   display: flex;
@@ -105,10 +108,14 @@ body.is-mobile-landscape {
 }
 
 body.is-mobile-landscape #game-shell {
-  width: 100vw;
+  position: fixed;
+  top: var(--app-top);
+  left: var(--app-left);
+  width: var(--app-width);
   height: var(--app-height);
   padding: 0;
   margin: 0;
+  overflow: hidden;
 }
 
 body.is-mobile-landscape .shell-header {
@@ -116,7 +123,7 @@ body.is-mobile-landscape .shell-header {
 }
 
 body.is-mobile-landscape #game-root {
-  width: 100vw;
+  width: var(--app-width);
   height: var(--app-height);
   border-radius: 0;
   border: none;
@@ -126,6 +133,6 @@ body.is-mobile-landscape #game-root {
 @supports (height: 100dvh) {
   body.is-mobile-landscape #game-shell,
   body.is-mobile-landscape #game-root {
-    height: 100dvh;
+    height: var(--app-height);
   }
 }
