@@ -63,8 +63,12 @@ body {
 
 #game-root canvas {
   display: block;
-  width: 100% !important;
-  height: 100% !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  max-height: none;
+  transform: translate(-50%, -50%);
   touch-action: none;
 }
 

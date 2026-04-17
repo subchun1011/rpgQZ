@@ -9,7 +9,10 @@ export default class World extends Phaser.Scene {
     const { width, height } = this.scale;
 
     // 1. 배경 설정 (필드 느낌의 딥 그린)
-    this.add.rectangle(width / 2, height / 2, width, height, 0x284b3f);
+    this.background = this.add
+      .rectangle(0, 0, width, height, 0x284b3f)
+      .setOrigin(0);
+    this.cameras.main.setBackgroundColor("#284b3f");
 
     // 2. 물리 그룹 설정 (나무들)
     this.trees = this.physics.add.staticGroup();
@@ -40,7 +43,7 @@ export default class World extends Phaser.Scene {
     });
 
     // 가이드 텍스트
-    this.add.text(width / 2, height - 30, "방향키: 이동 | E: 나무 베기 | B: 전투 테스트", {
+    this.guideText = this.add.text(width / 2, height - 30, "방향키: 이동 | E: 나무 베기 | B: 전투 테스트", {
         fontSize: "14px",
         color: "#cce3d5"
     }).setOrigin(0.5);
@@ -52,6 +55,17 @@ export default class World extends Phaser.Scene {
     this.input.keyboard.on('keydown-B', () => {
         this.scene.start('Battle');
     });
+
+    this.handleResize = (gameSize) => {
+      this.layout(gameSize.width, gameSize.height);
+    };
+
+    this.scale.on("resize", this.handleResize);
+    this.events.once("shutdown", () => {
+      this.scale.off("resize", this.handleResize);
+    });
+
+    this.layout(width, height);
   }
 
   update() {
@@ -99,5 +113,28 @@ export default class World extends Phaser.Scene {
   getInventoryString() {
     const state = gameManager.getState();
     return `🌲 나무: ${state.resources.wood} | 💰 골드: ${state.gold}`;
+  }
+
+  layout(width, height) {
+    if (this.background) {
+      this.background.setPosition(0, 0);
+      this.background.setSize(width, height);
+    }
+
+    if (this.player?.body) {
+      this.physics.world.setBounds(0, 0, width, height);
+      this.player.body.setCollideWorldBounds(true);
+
+      this.player.x = Phaser.Math.Clamp(this.player.x, 20, width - 20);
+      this.player.y = Phaser.Math.Clamp(this.player.y, 20, height - 20);
+    }
+
+    if (this.uiText) {
+      this.uiText.setPosition(20, 20);
+    }
+
+    if (this.guideText) {
+      this.guideText.setPosition(width / 2, height - 30);
+    }
   }
 }
