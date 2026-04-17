@@ -15,6 +15,12 @@ export default class Boot extends Phaser.Scene {
     this.load.json("questionBank", "../data/questionBank.sample.json");
 
     // [향후 추가] 로딩 바 등의 공용 UI 에셋 로딩 구간
+    // 🔥 Chibi 기사 스프라이트 시트 로드 (가로 3프레임, 세로 4프레임)
+    // frameWidth/frameHeight는 저장한 이미지의 실제 프레임 크기로 맞춰야 합니다. (예: 32x32, 48x48 등)
+    this.load.spritesheet('knight_hero', 'assets/sprites/knight_spritesheet.png', { 
+        frameWidth: 32, 
+        frameHeight: 32 
+    });
   }
 
   create() {
