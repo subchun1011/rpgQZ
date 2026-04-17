@@ -5,6 +5,7 @@ import Battle from "./scenes/Battle.js";
 import Upgrade from "./scenes/Upgrade.js";
 import { gameManager } from "./utils/GameManager.js";
 
+// [핵심] 뷰포트 및 레이아웃 관리 로직
 const updateViewportHeight = () => {
   const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
   document.documentElement.style.setProperty("--app-height", `${viewportHeight}px`);
@@ -34,15 +35,11 @@ const refreshLayout = () => {
 
 const tryLockLandscape = async () => {
   const orientationApi = window.screen?.orientation;
-
-  if (!orientationApi?.lock) {
-    return;
-  }
-
+  if (!orientationApi?.lock) return;
   try {
     await orientationApi.lock("landscape");
   } catch (error) {
-    // iOS Safari does not reliably support orientation lock without fullscreen.
+    // iOS Safari 대응
   }
 };
 
@@ -54,7 +51,7 @@ const config = {
   backgroundColor: "#101820",
   
   scale: {
-    mode: Phaser.Scale.ENVELOP,
+    mode: Phaser.Scale.ENVELOP, // 화면을 꽉 채우는 모드
     autoCenter: Phaser.Scale.CENTER_BOTH,
     expandParent: true,
     fullscreenTarget: "game-root",
@@ -81,22 +78,20 @@ window.addEventListener("load", async () => {
   window.gameManager = gameManager;
   window.phaserGame = new Phaser.Game(config);
 
-  const handleResize = () => {
-    refreshLayout();
-  };
+  const handleResize = () => refreshLayout();
 
   window.addEventListener("resize", handleResize, { passive: true });
   window.addEventListener("orientationchange", handleResize, { passive: true });
   window.visualViewport?.addEventListener("resize", handleResize, { passive: true });
+  
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) {
-      refreshLayout();
-    }
+    if (!document.hidden) refreshLayout();
   });
 
   refreshLayout();
   await tryLockLandscape();
 
+  // iOS Safari 주소창 숨기기 트리거
   setTimeout(() => {
     window.scrollTo(0, 1);
     refreshLayout();
