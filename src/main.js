@@ -11,10 +11,22 @@ const updateViewportHeight = () => {
   document.documentElement.style.setProperty("--app-height", `${viewportHeight}px`);
 };
 
+const isTouchDevice = () =>
+  window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
+  navigator.maxTouchPoints > 1;
+
+const updateDeviceLayoutState = () => {
+  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+  const mobileLikeDevice = isTouchDevice();
+
+  document.body.classList.toggle("is-touch-device", mobileLikeDevice);
+  document.body.classList.toggle("is-mobile-landscape", mobileLikeDevice && !isPortrait);
+  document.body.classList.toggle("is-mobile-portrait", mobileLikeDevice && isPortrait);
+};
+
 const updateOrientationNotice = () => {
-  const isPortraitMobile = window.matchMedia(
-    "(orientation: portrait) and (max-width: 1024px)"
-  ).matches;
+  const isPortraitMobile = isTouchDevice() &&
+    window.matchMedia("(orientation: portrait)").matches;
   const notice = document.getElementById("orientation-notice");
 
   document.body.classList.toggle("is-portrait", isPortraitMobile);
@@ -26,6 +38,7 @@ const updateOrientationNotice = () => {
 
 const refreshLayout = () => {
   updateViewportHeight();
+  updateDeviceLayoutState();
   updateOrientationNotice();
 
   if (window.phaserGame?.scale) {
@@ -72,6 +85,7 @@ const config = {
 
 window.addEventListener("load", async () => {
   updateViewportHeight();
+  updateDeviceLayoutState();
   updateOrientationNotice();
 
   gameManager.initialize();
